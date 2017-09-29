@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Setup for react-test image gallery stack that runs nodejs back-end within an
+  EC2 instance and uses an S3 bucket for storing images.
+Resources:
+
+  # This EC2 instance will host the nodejs back end and the front end resources
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    ImageId:
+      Fn::FindInMap:
+        - RegionMap
+        - Ref: AWS::Region
+        - AMI
+
+  # S3 Bucket is readable by anyone, writeable only by the app
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: PublicRead
+
+  S3BucketPolicy:
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Statement:
+          - Action:
+            - s3:DeleteObject
+            - s3:PutObject
+            - s3:ListBucket
+            Effect: Allow
+            Resource: !Ref S3Bucket
+            Principal: "*"
+            Condition:
+              StringLike:
+                aws:Referer:
+                  - "http://www.nojazi.com/*"

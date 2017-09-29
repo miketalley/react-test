@@ -3,7 +3,7 @@ import { Image } from 'semantic-ui-react';
 
 const CustomImage = (props) => {
   return (
-    <Image src={props.image.src} />
+    <Image {...props} />
   );
 };
 
